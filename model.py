@@ -1,4 +1,4 @@
-from keras.layers import Embedding, Reshape, Merge, Activation, Input, merge
+from keras.layers import Embedding, Reshape, Activation, Input, Dot
 from keras.models import Sequential, Model
 
 
@@ -18,9 +18,8 @@ def create_model(numNodes, factors):
     left_embed = left_model(left_input)
     right_embed = left_model(right_input)
 
-    left_right_dot = merge([left_embed, right_embed], mode="dot", dot_axes=1, name="left_right_dot")
-
-    model = Model(input=[left_input, right_input], output=[left_right_dot])
-    embed_generator = Model(input=[left_input, right_input], output=[left_embed, right_embed])
+    left_right_dot = Dot(axes=1,name="left_right_dot")([left_embed, right_embed])
+    model = Model([left_input, right_input], [left_right_dot])
+    embed_generator = Model([left_input, right_input], [left_embed, right_embed])
 
     return model, embed_generator
