@@ -2,6 +2,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import random
 import keras.backend as K
+import tensorflow as tf
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 import math
@@ -45,7 +46,7 @@ def load_data(label_file, edge_file):
 
 
 def LINE_loss(y_true, y_pred):
-    coeff = y_true*2 - 1
+    coeff = tf.cast((y_true*2 - 1),tf.float32)
     return -K.mean(K.log(K.sigmoid(coeff*y_pred)))
 
 
