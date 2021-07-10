@@ -5,11 +5,13 @@ import random
 
 
 if __name__ == "__main__":
+    vector_tag = ""
 
-    label_file = 'dblp/labels.txt'
-    edge_file = 'dblp/adjedges.txt'
-    epoch_num = 100
-    factors = 128
+    label_file = vector_tag + '.line_labels'
+    edge_file = vector_tag + '.line_edges'
+    save_file_name = vector_tag + '.vector'
+    epoch_num = 1
+    factors = 512
     batch_size = 1000
     negative_sampling = "UNIFORM" # UNIFORM or NON-UNIFORM
     negativeRatio = 5
@@ -33,19 +35,23 @@ if __name__ == "__main__":
 
     new_X = []
     new_label = []
-
+    vectors = []
     keys = list(labels_dict.keys())
     np.random.shuffle(keys)
 
     for k in keys:
         v = labels_dict[k]
         x = embed_generator.predict_on_batch([np.asarray([k]), np.asarray([k])])
-        new_X.append(x[0][0] + x[1][0])
+        vector = x[0][0] + x[1][0]
+        vector_string = ""
+        for i in vector:
+          vector_string += str(i) + " "
+        
+        vectors.append(f"{v} {vector_string}")
         new_label.append(labels_dict[k])
+    for i in vectors:
+      print(i)
 
-    new_X = np.asarray(new_X, dtype=np.float32)
-    new_label = np.asarray(new_label, dtype=np.int32)
-
-    [train_acc, valid_acc, test_acc] = svm_classify(new_X, new_label, split_ratios, svm_C)
-
-    print("Train Acc:", train_acc, " Validation Acc:", valid_acc, " Test Acc:", test_acc)
+    with open(save_file_name, "w") as f:
+      for i in vectors:
+        f.write(i+"\n")
